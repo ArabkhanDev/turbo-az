@@ -113,7 +113,6 @@ public class CarServiceImpl implements CarService {
             if (car.getCreated() != null) {
                 predicates.add(cb.equal(root.get("created"), car.getCreated()));
             }
-            // Add predicates for other parameters similarly
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };
