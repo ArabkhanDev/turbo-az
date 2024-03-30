@@ -15,8 +15,22 @@ services:
     image: adminer
     restart: always
     ports:
-      - 8580:8080
+      - "8580:8080"
+
+
+  application:
+    image: arabkhan/turbo-az:0.0.1-SNAPSHOT
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_CONNECTION_IP=db
+      - DB_CONNECTION_USERNAME=root
+      - DB_CONNECTION_PASSWORD=password
+      - DB_CONNECTION_PORT=3306
+    depends_on:
+      - db
+
 volumes:
   db_data:
-  elasticsearch_data:
 

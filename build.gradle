@@ -1,11 +1,18 @@
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+import com.bmuschko.gradle.docker.tasks.image.DockerPushImage
+import com.bmuschko.gradle.docker.tasks.image.Dockerfile
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.2.4'
 	id 'io.spring.dependency-management' version '1.1.4'
+	id 'com.bmuschko.docker-remote-api' version "$dockerVersion" apply true
 }
 
 group = 'com.company'
-version = '0.0.1-SNAPSHOT'
+
+	def ref = 'git rev-parse --short HEAD'.execute().text.trim();
+	version = "$projectVersion.$ref"
 
 java {
 	sourceCompatibility = '17'
@@ -16,6 +23,8 @@ configurations {
 		extendsFrom annotationProcessor
 	}
 }
+
+ext.images = []
 
 repositories {
 	mavenCentral()
@@ -34,6 +43,63 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
+
+task dockerFile(type: Dockerfile, dependsOn: assemble) {
+	destFile.set(project.file('Dockerfile'))
+	from "alpine:$alpineVersion"
+	runCommand 'apk add --no-cache openjdk17'
+	runCommand 'apk add --no-cache tzdata'
+	copyFile "build/libs/${project.name}-${project.version}.jar", '/app/'
+	workingDir '/app/'
+	entryPoint 'java'
+	defaultCommand '-jar', "/app/${project.name}-${project.version}.jar"
+}
+
+
+task dockerBuild(dependsOn: dockerFile) {
+	doLast {
+		println("creating image: $dockerRepoUrl/${project.name}:$version")
+	}
+	def projectDirPath = project.projectDir.path
+	def dockerfilePath = project.file('Dockerfile').path
+	def jarFilePath = "${project.buildDir}/libs/${project.name}-${project.version}.jar"
+	inputs.files files(dockerfilePath, jarFilePath)
+	outputs.dir "$projectDirPath/build/docker"
+	doLast {
+		ant.exec(executable: 'docker', failonerror: true) {
+			arg(value: 'build')
+			arg(value: '-t')
+			arg(value: "$dockerRepoUrl/${project.name}:$version")
+			arg(value: '-f')
+			arg(value: dockerfilePath)
+			arg(value: projectDirPath)
+		}
+	}
+	images.add("$dockerRepoUrl/${project.name}:$version")
+}
+
+//task dockerBuild(type: DockerBuildImage, dependsOn: dockerFile) {
+//	print rootDir
+//	inputDir.set(file("$rootDir/."))
+//	doLast {
+//		println("creatig image: $dockerRepoUrl/ing-site-${project.name}:$version")
+//	}
+//	images.add("$dockerRepoUrl/${project.name}:$version")
+//}
+
+
+task dockerPush(type: DockerPushImage, dependsOn: dockerBuild) {
+	images.add("$dockerRepoUrl/${project.name}:$version")
+
+	registryCredentials.setUsername("$dockerHubUsername")
+	registryCredentials.setPassword("$dockerHubPassword")
+	registryCredentials.setEmail("$dockerHubEmail")
+}
+task runDockerCompose(type: Exec, dependsOn: dockerPush) {
+
+	commandLine 'docker-compose', 'up', '-d'
+}
+
 
 tasks.named('test') {
 	useJUnitPlatform()
