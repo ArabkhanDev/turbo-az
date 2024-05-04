@@ -1,11 +1,8 @@
 package com.company.turboaz.dto.response;
 
-import com.company.turboaz.model.SellerEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -19,5 +16,5 @@ public class CarResponseDTO {
     private Integer engineVolume;
     private Integer price;
     private Integer mileage;
-//    private SellerEntity seller;
+//    private User seller;
 }

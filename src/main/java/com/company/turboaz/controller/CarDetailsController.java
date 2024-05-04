@@ -1,9 +1,7 @@
 package com.company.turboaz.controller;
 
 import com.company.turboaz.dto.request.CarDetailsRequestDTO;
-import com.company.turboaz.dto.request.SellerRequestDTO;
 import com.company.turboaz.model.CarDetailsEntity;
-import com.company.turboaz.model.SellerEntity;
 import com.company.turboaz.service.CarDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

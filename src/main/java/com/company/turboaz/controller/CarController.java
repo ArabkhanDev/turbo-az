@@ -27,6 +27,11 @@ public class CarController {
         return carService.getCar(id);
     }
 
+    @GetMapping("/hello")
+    public String getCar2() {
+        return "Hello Worlds";
+    }
+
 
     @GetMapping("/search")
     public ResponseEntity<Page<CarResponseDTO>> getVehicleByParams(@RequestParam(required = false) String name,

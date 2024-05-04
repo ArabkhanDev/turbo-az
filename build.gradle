@@ -38,6 +38,12 @@ dependencies {
 
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
 
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -95,6 +101,24 @@ task dockerPush(type: DockerPushImage, dependsOn: dockerBuild) {
 	registryCredentials.setPassword("$dockerHubPassword")
 	registryCredentials.setEmail("$dockerHubEmail")
 }
+
+
+task deploy() {
+	def dockerImageTag = version
+	def findDockerComposePath = new File(rootDir, 'docker-compose.yaml')
+
+	def dockerComposeFile = file(findDockerComposePath)
+	def dockerComposeContent = dockerComposeFile.text
+
+	def updatedDockerComposeContent = dockerComposeContent
+			.replaceAll(/${project.name}:\n\s+image: \S+/, "${project.name}:\n    " +
+					"image: ${dockerHubUsername}/${project.name}:${dockerImageTag}")
+
+	dockerComposeFile.write(updatedDockerComposeContent)
+
+	println "Docker image tag '${dockerImageTag}' changed ."
+}
+
 task runDockerCompose(type: Exec, dependsOn: dockerPush) {
 
 	commandLine 'docker-compose', 'up', '-d'

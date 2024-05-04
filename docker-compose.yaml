@@ -9,7 +9,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: password
     ports:
-      - 3306:3306
+      - "3306:3306"
   adminer:
     hostname: mysql
     image: adminer
@@ -19,7 +19,7 @@ services:
 
 
   application:
-    image: arabkhan/turbo-az:0.0.1-SNAPSHOT
+    image: arabkhan/turbo-az:1.0.5be864b.jar
     restart: always
     ports:
       - "8080:8080"

@@ -31,8 +31,8 @@ public class CarEntity {
 
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "seller_id")
-    private SellerEntity sellers;
+    @JoinColumn(name = "user_id")
+    private User users;
 
 
 

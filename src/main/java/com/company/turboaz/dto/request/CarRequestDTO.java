@@ -15,5 +15,5 @@ public class CarRequestDTO {
     private Integer price;
     private Integer mileage;
     private Date created;
-    private Long sellerId;
+    private Long userId;
 }

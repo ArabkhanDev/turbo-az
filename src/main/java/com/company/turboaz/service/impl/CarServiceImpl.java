@@ -4,9 +4,9 @@ import com.company.turboaz.dto.request.CarRequestDTO;
 import com.company.turboaz.dto.request.CarSearchDTO;
 import com.company.turboaz.dto.response.CarResponseDTO;
 import com.company.turboaz.model.CarEntity;
-import com.company.turboaz.model.SellerEntity;
+import com.company.turboaz.model.User;
 import com.company.turboaz.repository.CarRepository;
-import com.company.turboaz.repository.SellerRepository;
+import com.company.turboaz.repository.UserRepository;
 import com.company.turboaz.service.CarService;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
@@ -26,13 +26,13 @@ import java.util.List;
 public class CarServiceImpl implements CarService {
 
     private final CarRepository carRepository;
-    private final SellerRepository sellerRepository;
+    private final UserRepository userRepository;
     private final ModelMapper modelMapper;
 
     @Override
     public CarEntity addCar(CarRequestDTO carRequestDTO) {
         CarEntity carEntity = new CarEntity();
-//        modelMapper.map(carRequestDTO, carEntity); didnt work
+        modelMapper.map(carRequestDTO, carEntity); //didnt work
         carEntity.setCreated(carRequestDTO.getCreated());
         carEntity.setImage(carRequestDTO.getImage());
         carEntity.setManufactureYear(carRequestDTO.getManufactureYear());
@@ -42,10 +42,10 @@ public class CarServiceImpl implements CarService {
         carEntity.setPrice(carRequestDTO.getPrice());
         carEntity.setEngineVolume(carRequestDTO.getEngineVolume());
 
-        Long sellerId = carRequestDTO.getSellerId();
-        if (sellerId != null){
-            SellerEntity seller = sellerRepository.getReferenceById(sellerId);
-            carEntity.setSellers(seller);
+        Long userId = carRequestDTO.getUserId();
+        if (userId != null){
+            User seller = userRepository.getReferenceById(userId);
+            carEntity.setUsers(seller);
         }
         return carRepository.save(carEntity);
     }
@@ -69,10 +69,10 @@ public class CarServiceImpl implements CarService {
         carEntity.setPrice(carRequestDTO.getPrice());
         carEntity.setEngineVolume(carRequestDTO.getEngineVolume());
 
-        Long sellerId = carRequestDTO.getSellerId();
-        if (sellerId != null){
-            SellerEntity seller = sellerRepository.getReferenceById(sellerId);
-            carEntity.setSellers(seller);
+        Long userId = carRequestDTO.getUserId();
+        if (userId != null){
+            User seller = userRepository.getReferenceById(userId);
+            carEntity.setUsers(seller);
         }
         return carRepository.save(carEntity);
     }
